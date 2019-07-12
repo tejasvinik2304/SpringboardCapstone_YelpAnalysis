@@ -58,15 +58,15 @@ def filter_and_convert_to_csv(filename):
         outputWriter = csv.DictWriter(outputFile, fieldnames = fields, lineterminator='\n')
         print ("Converting " + filename + " to " + "yelp_academic_user_review.csv ...")
 
-     # Read line by line, write user_id and name to CSV file  
-    for line in open(filename, 'r'):
-        r = json.loads(line)
+         # Read line by line, write user_id and name to CSV file  
+        for line in open(filename, 'r'):
+            r = json.loads(line)
 
-        # To handle name values with unicode, call "encode" to remove the unicode character. 
-        # This presents a problem from occurring in "writerow" (which cannot handle unicode well)
-        n = r['name']
-        n1 = n.encode('ascii', 'ignore')
-        outputWriter.writerow({'user_id': r['user_id'], 'name': n1})
+            # To handle name values with unicode, call "encode" to remove the unicode character. 
+            # This presents a problem from occurring in "writerow" (which cannot handle unicode well)
+            n = r['name']
+            n1 = n.encode('ascii', 'ignore')
+            outputWriter.writerow({'user_id': r['user_id'], 'name': n1})
 
     elif "business" in filename:
   
