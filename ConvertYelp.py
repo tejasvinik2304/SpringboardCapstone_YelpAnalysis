@@ -42,7 +42,7 @@ def filter_and_convert_to_csv(filename):
      
          # The "lineterminator='\n' is needed to prevent an extra blank line between each line. 
         outputWriter = csv.DictWriter(outputFile, fieldnames = fields, lineterminator='\n')
-        print "Converting " + filename + " to " + "yelp_academic_dataset_review.csv ..."
+        print("Converting " + filename + " to " + "yelp_academic_dataset_review.csv ...")
    
         # Read line by line, write user_id, business_id, and stars to CSV file  
         for line in open(filename, 'r'):
@@ -56,7 +56,7 @@ def filter_and_convert_to_csv(filename):
 
         # The "lineterminator='\n' is needed to prevent an extra blank line between each line.     
         outputWriter = csv.DictWriter(outputFile, fieldnames = fields, lineterminator='\n')
-        print "Converting " + filename + " to " + "yelp_academic_user_review.csv ..."
+        print ("Converting " + filename + " to " + "yelp_academic_user_review.csv ...")
 
      # Read line by line, write user_id and name to CSV file  
     for line in open(filename, 'r'):
@@ -73,7 +73,7 @@ def filter_and_convert_to_csv(filename):
         outputFile = open('yelp_academic_dataset_business.csv', 'w')
         fields= ['business_id', 'city', 'name', 'categories', 'review_count', 'stars']     
         outputWriter = csv.DictWriter(outputFile, fieldnames = fields, lineterminator='\n')
-        print "Converting " + filename + " to " + "yelp_academic_dataset_review.csv ..."
+        print ("Converting " + filename + " to " + "yelp_academic_dataset_review.csv ...")
 
         # Read line by line, write relevant fields if the business is a restaurant
         for line in open(filename, 'r'):
@@ -93,7 +93,7 @@ def filter_and_convert_to_csv(filename):
                                   
     else: 
   
-        print "Error!  Unexpected filename used."
+        print ("Error!  Unexpected filename used.")
         exit()
                 
     outputFile.close
@@ -107,7 +107,7 @@ def main():
     args = sys.argv[1:]
 
     if not args:
-        print 'usage: file'
+        print ('usage: file')
         sys.exit(1)
 
     filter_and_convert_to_csv(sys.argv[1])
