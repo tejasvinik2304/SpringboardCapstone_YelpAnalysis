@@ -7,9 +7,12 @@
 #############################################
 
 # Load library
+install.packages("dplyr")
 library(dplyr)
 
 # Read in csv files
+setwd('C:\\Users\\p14te\\Desktop\\Yelp\\springboardCapstone_YelpAnalysis')
+
 reviews    <- read.csv("yelp_academic_dataset_review.csv",   header = FALSE)
 users      <- read.csv("yelp_academic_dataset_user.csv",     header = FALSE)
 businesses <- read.csv("yelp_academic_dataset_business.csv", header = FALSE)
