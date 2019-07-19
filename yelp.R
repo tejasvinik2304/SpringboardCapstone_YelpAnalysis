@@ -7,7 +7,7 @@
 #############################################
 
 # Load library
-install.packages("dplyr")
+
 library(dplyr)
 
 # Read in csv files
@@ -18,7 +18,7 @@ users      <- read.csv("yelp_academic_dataset_user.csv",     header = FALSE)
 businesses <- read.csv("yelp_academic_dataset_business.csv", header = FALSE)
 
 # Add names to the fields
-colnames(reviews)[1] = "user_id"
+colnames(reviews)[1] = "user_id" 
 colnames(reviews)[2] = "business_id"
 colnames(reviews)[3] = "stars"
 colnames(users)[1] = "user_id"
@@ -58,96 +58,51 @@ mean(num_reviews_Indian$tot_rev)
 # Part 2b:  Analysis of Method 1 -- Extension to Other Cuisines #
 #################################################################
 
-rub$is_chinese <- grepl("Chinese", rub$categories) == TRUE
-chinese <- subset(rub, is_chinese == TRUE)
-num_reviews_Chinese <- chinese %>% select(user_id, user_name, is_chinese) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_chinese))
-table(num_reviews_Chinese$tot_rev)
-count(num_reviews_Chinese)
-mean(num_reviews_Chinese$tot_rev)
+########################
 
-rub$is_mexican <- grepl("Mexican", rub$categories) == TRUE
-mexican <- subset(rub, is_mexican == TRUE)
-num_reviews_Mexican <- mexican %>% select(user_id, user_name, is_mexican) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_mexican))
-table(num_reviews_Mexican$tot_rev)
-count(num_reviews_Mexican)
-mean(num_reviews_Mexican$tot_rev)
+#cur_c stores current cuisine
+#rub$cur_c in each iteration updates the flag
+#curr_c_df store the rows from rub with that cuisine
+#num_reviews_by_country[index] will store details of that cuisine
 
-rub$is_italian <- grepl("Italian", rub$categories) == TRUE
-italian <- subset(rub, is_italian == TRUE)
-num_reviews_Italian <- italian %>% select(user_id, user_name, is_italian) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_italian))
-table(num_reviews_Italian$tot_rev)
-count(num_reviews_Italian)
-mean(num_reviews_Italian$tot_rev)
 
-# For Japanese, look for "Japanese" or "Sushi"
-rub$is_japanese <- (grepl("Japanese", rub$categories) == TRUE) | 
-                   (grepl("Sushi",    rub$categories) == TRUE)
-japanese <- subset(rub, is_japanese == TRUE)
-num_reviews_Japanese <- japanese %>% select(user_id, user_name, is_japanese) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_japanese))
-table(num_reviews_Japanese$tot_rev)
-count(num_reviews_Japanese)
-mean(num_reviews_Japanese$tot_rev)
+#rub$current_c <- blah
+# "Indian" or "Roti" or "Curry" -> Indian
+# "Japanese" or "Sushi" -> Japanese
+# "Chinese" or "Noodles" -> Chinese
 
-rub$is_greek <- grepl("Greek", rub$categories) == TRUE
-greek <- subset(rub, is_greek == TRUE)
-num_reviews_Greek <- greek %>% select(user_id, user_name, is_greek) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_greek))
-table(num_reviews_Greek$tot_rev)
-count(num_reviews_Greek)
-mean(num_reviews_Greek$tot_rev)
+c_list <- list("Indian"= c(c("Indian")),"Japanese"= c("Japanese","Sushi"),"Chinese" = c("Chinese"),"Italian"=c("Italian"), "greek"=c("greek"),"french"=c("french"),"thai"=c("thai"),"spanish"=c("tapas","spanish"),"Mediterranean"=c("Mediterranean"))
+print(names(c_list))
+num_reviews_by_country <- list()
+Indian <- NULL
+#loop starts
+for(curr_c_name in names(c_list))
+{
+search_words <- c_list[curr_c_name]
+rub$curr_c <- grepl(paste(search_words[[1]], collapse="|"), rub$categories) == TRUE
 
-rub$is_french <- grepl("French", rub$categories) == TRUE
-french <- subset(rub, is_french == TRUE)
-num_reviews_French <- french %>% select(user_id, user_name, is_french) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_french))
-table(num_reviews_French$tot_rev)
-count(num_reviews_French)
-mean(num_reviews_French$tot_rev)
+curr_c_df <- subset(rub, curr_c == TRUE)
+if (curr_c_name=="Indian")
+{
+  Indian <- curr_c_df
+  
+}
+print(nrow(curr_c_df))
+num_reviews_by_country[[curr_c_name]]<- curr_c_df %>% select(user_id, user_name, curr_c) %>%
+  group_by(user_id) %>%
+  summarise(tot_rev = sum(curr_c))
+print(table(num_reviews_by_country[[curr_c_name]]$tot_rev))
+print(count(num_reviews_by_country[[curr_c_name]]))
+print(mean(num_reviews_by_country[[curr_c_name]]$tot_rev))
+}
 
-rub$is_thai <- grepl("Thai", rub$categories) == TRUE
-thai <- subset(rub, is_thai == TRUE)
-num_reviews_Thai <- thai %>% select(user_id, user_name, is_thai) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_thai))
-table(num_reviews_Thai$tot_rev)
-count(num_reviews_Thai)
-mean(num_reviews_Thai$tot_rev)
-
-rub$is_spanish <- (grepl("Spanish", rub$categories) == TRUE) | 
-                  (grepl("Tapas",   rub$categories) == TRUE)
-spanish <- subset(rub, is_spanish == TRUE)
-num_reviews_Spanish <- spanish %>% select(user_id, user_name, is_spanish) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_spanish))
-table(num_reviews_Spanish$tot_rev)
-count(num_reviews_Spanish)
-mean(num_reviews_Spanish$tot_rev)
-
-rub$is_mediterranean <- grepl("Mediterranean", rub$categories) == TRUE
-mediterranean <- subset(rub, is_mediterranean == TRUE)
-num_reviews_Mediterranean <- mediterranean %>% select(user_id, user_name, is_mediterranean) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_mediterranean))
-table(num_reviews_Mediterranean$tot_rev)
-count(num_reviews_Mediterranean)
-mean(num_reviews_Mediterranean$tot_rev)
 
 #####################################################################
 # Part 2c:  Analysis of Method 1 -- Apply new weight and see effect #
 #####################################################################
 
 # Combine num_reviews information with original data frame of indian restaurant reviews
-cin <- inner_join(indian, num_reviews_Indian)
+cin <- inner_join(indian, num_reviews_by_country[["Indian"]])
 
 # Generate "weighted_stars" for later calculation
 cin$weighted_stars <- cin$stars * cin$tot_rev
@@ -199,13 +154,10 @@ avg_rating_Indian <- indian %>% select(business_id, business_name, city, stars,
                                           dif = ias - avg)
 
 # Find out extent of effect of new rating
+summary(avg_rating_Indian)
 summary(avg_rating_Indian$dif)
 
 # Limit to those restaurants with at least 5 "immigrant" reviews and look at effect again
 ari5 <- subset (avg_rating_Indian, nin > 5)                                        
 summary(ari5$dif)
-
-
-
-
-
+summary(ari5)
