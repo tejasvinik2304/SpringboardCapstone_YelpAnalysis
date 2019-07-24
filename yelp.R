@@ -144,8 +144,8 @@ for(i in 1:68325)
 {
   print(i)
 if(cin$word_num[i] > mean(cin$word_num)){
-  if(cin$stars[i]>3){
-      cin$newrate[i] <- max(cin$stars[i]*(1+((cin$word_num[i]- mean)/cin$word_num[i])),5)
+  if(cin$stars[i]>=3){
+      cin$newrate[i] <- min(cin$stars[i]*(1+((cin$word_num[i]- mean)/cin$word_num[i])),5)
   }
   else{
       cin$newrate[[i]] <- max(cin$stars[[i]]*(1-((cin$word_num[[i]]- mean)/cin$word_num[[i]])),1)

@@ -39,7 +39,7 @@ def filter_and_convert_to_csv(filename):
     if "review" in filename:
   
         outputFile = open('yelp_academic_dataset_review.csv', 'w')
-        fields= ['user_id', 'business_id', 'stars']     
+        fields= ['user_id', 'business_id', 'stars','word_num']     
      
          # The "lineterminator='\n' is needed to prevent an extra blank line between each line. 
         outputWriter = csv.DictWriter(outputFile, fieldnames = fields, lineterminator='\n')
@@ -48,7 +48,10 @@ def filter_and_convert_to_csv(filename):
         # Read line by line, write user_id, business_id, and stars to CSV file  
         for line in codecs.open(filename, encoding='utf-8'):
             r = json.loads(line)
-            outputWriter.writerow({'user_id': r['user_id'], 'business_id': r['business_id'], 'stars': r['stars']})
+            txt = r['text']
+            cleaned_txt = txt.encode('ascii', 'ignore')
+            word_num= len(cleaned_txt.split())
+            outputWriter.writerow({'user_id': r['user_id'], 'business_id': r['business_id'], 'stars': r['stars'],'word_num': word_num})
 
     elif "user" in filename:
 
