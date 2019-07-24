@@ -21,6 +21,7 @@ businesses <- read.csv("yelp_academic_dataset_business.csv", header = FALSE)
 colnames(reviews)[1] = "user_id" 
 colnames(reviews)[2] = "business_id"
 colnames(reviews)[3] = "stars"
+colnames(reviews)[4] = "word_num"
 colnames(users)[1] = "user_id"
 colnames(users)[2] = "user_name"
 colnames(businesses)[1] = "business_id"
@@ -34,52 +35,24 @@ colnames(businesses)[6] = "avg_stars"
 ru  <- inner_join(reviews, users)
 rub <- inner_join(ru, businesses)
 
-######################################################
-# Part 2a:  Analysis of Method 1 -- Initial Analysis #
-######################################################
-
-# Add "is_indian" field for any review that has "Indian" in "categories"
-rub$is_indian <- grepl("Indian", rub$categories) == TRUE
-
-# Make a dataframe of just reviews of Indian restaurants
-indian <- subset(rub, is_indian == TRUE)
-
-# Generate a summary of # of reviews of that cuisine done by each reviewer
-num_reviews_Indian <- indian %>% select(user_id, user_name, is_indian) %>%
-  group_by(user_id) %>% 
-  summarise(tot_rev = sum(is_indian))
-
-# Print the table, show the total # of entries, and find the avg # of reviews per user
-table(num_reviews_Indian$tot_rev)
-count(num_reviews_Indian)
-mean(num_reviews_Indian$tot_rev)
 
 #################################################################
 # Part 2b:  Analysis of Method 1 -- Extension to Other Cuisines #
 #################################################################
 
-########################
-
-#cur_c stores current cuisine
-#rub$cur_c in each iteration updates the flag
-#curr_c_df store the rows from rub with that cuisine
-#num_reviews_by_country[index] will store details of that cuisine
-
-
-#rub$current_c <- blah
-# "Indian" or "Roti" or "Curry" -> Indian
-# "Japanese" or "Sushi" -> Japanese
-# "Chinese" or "Noodles" -> Chinese
-
 c_list <- list("Indian"= c(c("Indian")),"Japanese"= c("Japanese","Sushi"),"Chinese" = c("Chinese"),"Italian"=c("Italian"), "greek"=c("greek"),"french"=c("french"),"thai"=c("thai"),"spanish"=c("tapas","spanish"),"Mediterranean"=c("Mediterranean"))
 print(names(c_list))
 num_reviews_by_country <- list()
 Indian <- NULL
+is_Indian<- NULL
 #loop starts
 for(curr_c_name in names(c_list))
 {
 search_words <- c_list[curr_c_name]
 rub$curr_c <- grepl(paste(search_words[[1]], collapse="|"), rub$categories) == TRUE
+
+rub$is_indian <- grepl("Indian", rub$categories) == TRUE
+indian <- subset(rub, is_indian == TRUE)
 
 curr_c_df <- subset(rub, curr_c == TRUE)
 if (curr_c_name=="Indian")
@@ -102,7 +75,7 @@ print(mean(num_reviews_by_country[[curr_c_name]]$tot_rev))
 #####################################################################
 
 # Combine num_reviews information with original data frame of indian restaurant reviews
-cin <- inner_join(indian, num_reviews_by_country[["Indian"]])
+cin <- inner_join(Indian, num_reviews_by_country[["Indian"]])
 
 # Generate "weighted_stars" for later calculation
 cin$weighted_stars <- cin$stars * cin$tot_rev
@@ -127,7 +100,7 @@ summary(nri5$dif)
 ################################################################
 # Part 3:  Analysis of Method 2 -- Generate "immigrant" rating #
 ################################################################
-
+indian <- Indian
 # Read Indian names into a list
 inames <- scan("indian_names.txt", what = character())
 
@@ -161,3 +134,25 @@ summary(avg_rating_Indian$dif)
 ari5 <- subset (avg_rating_Indian, nin > 5)                                        
 summary(ari5$dif)
 summary(ari5)
+
+#######################################################################
+# Part 3b:  Analysis of Method 3 -- Generate rating based on word count
+#######################################################################
+cin$newrate <- c()
+mean<- mean(cin$word_num)
+for(i in 1:68325)
+{
+  print(i)
+if(cin$word_num[i] > mean(cin$word_num)){
+  if(cin$stars[i]>3){
+      cin$newrate[i] <- max(cin$stars[i]*(1+((cin$word_num[i]- mean)/cin$word_num[i])),5)
+  }
+  else{
+      cin$newrate[[i]] <- max(cin$stars[[i]]*(1-((cin$word_num[[i]]- mean)/cin$word_num[[i]])),1)
+  }
+    summary(cin$newrate)  
+}
+else{
+  cin$newrate[i]<-cin$stars[i]
+}
+}
